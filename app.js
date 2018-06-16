@@ -191,54 +191,6 @@ class BinarySearchTree
     }
 }
 
-//#################################################################
-//#################################################################
-//#################################################################
-//#################################################################
-//#######################  Hash Table  ############################
-//#################################################################
-//#################################################################
-//#################################################################
-//#################################################################
-//#################################################################
-//#################################################################
-//#################################################################
-
-/*https://gist.github.com/alexhawkins/48d7fd31af6ed00e5c60*/
-
-class HashTable {
-  
-    constructor(){
-
-        this.data = [];
-    }
-
-    createHashIndex(key) {
-        var hash = 0;
-        for (var i = 0; i < key.length; i++) {
-            hash = (hash << 5) - hash + key.charCodeAt(i);
-            hash = hash >>> 0; //convert to 32bit unsigned integer
-        }
-        return Math.abs(hash % 1000);
-    }
-
-    insert(key, value) {
-        if (key === undefined || value === undefined || key.length === 0 || value.length === 0)
-            throw ('Insertion of undefined not possible')
-        else {
-            var hashIndex = this.createHashIndex(key);
-            this.data[hashIndex] = value;
-        }
-        return this;
-    }
-
-    getValue(key) {
-        var hashIndex = this.createHashIndex(key);
-        //return key + ': ' + this.data[hashIndex];
-        return this.data[hashIndex];
-    }
-
-};
 
 //#################################################################
 //#################################################################
@@ -252,6 +204,15 @@ class HashTable {
 //#################################################################
 //#################################################################
 //#################################################################
+function intersection(setA, setB) {
+    var _intersection = new Set();
+    for (var elem of setB) {
+        if (setA.has(elem)) {
+            _intersection.add(elem);
+        }
+    }
+    return _intersection;
+}
 
 
 class moviesData {
@@ -262,19 +223,10 @@ class moviesData {
 		this.arrayOfGenres = [];
 	}
 
-	intersection(setA, setB) {
-    var _intersection = new Set();
-    for (var elem of setB) {
-        if (setA.has(elem)) {
-            _intersection.add(elem);
-        }
-    }
-    return _intersection;
-}
 
 	loadData(jsonFile){
 		var tempYearNode;
-		var tempBinaryTree;
+		//var tempBinaryTree;
 		var tempListOfWords
 		var tempTreeNode = new TreeNode('a');
 		var thisMovie;
@@ -288,7 +240,6 @@ class moviesData {
 				indexOfMovie--;
 			}else{
 				tempYearNode = this.arrayYears[jsonFile[indexOfMovie].year % jsonFile[0].year];
-
 				// Add genres of movie to Hash
 				if(thisMovie.genre == null){
 					listOfGenres = ["SinGenero"];
@@ -307,17 +258,17 @@ class moviesData {
 						break;
 					}
 					
-					tempBinaryTree = tempYearNode.genresHash.getValue(listOfGenres[indexOfGenre]);
+					
 					listOfGenres[indexOfGenre] = listOfGenres[indexOfGenre].replace(" ", "");
-					listOfGenres[indexOfGenre] = listOfGenres[indexOfGenre].toLowerCase()
-					console.log("-" + listOfGenres[indexOfGenre] + "-");
+					listOfGenres[indexOfGenre] = listOfGenres[indexOfGenre].toLowerCase();
+
+					let tempBinaryTree = tempYearNode.genresHash.get([jsonFile[indexOfMovie].year,listOfGenres[indexOfGenre]]);
+
 					if(tempBinaryTree == null || tempBinaryTree == undefined){
 						tempBinaryTree = new BinarySearchTree();
-						tempYearNode.genresHash.insert(listOfGenres[indexOfGenre], tempBinaryTree);
+						tempYearNode.genresHash.set([jsonFile[indexOfMovie].year,listOfGenres[indexOfGenre]], tempBinaryTree);
 						this.arrayOfGenres.push(listOfGenres[indexOfGenre]);
 					}else{
-						console.log("Find it!");
-						console.log(listOfGenres[indexOfGenre]);
 					}
 					tempBinaryTree.count++;
 		 
@@ -364,35 +315,27 @@ class moviesData {
 		var tempBinaryTree;
 
 		// Iterate years
-		console.log( jsonQuery.firstYear);
-		console.log( jsonQuery.lastYear);
-		console.log( this.arrayYears[0]);
 		for(var thisYearIndex = jsonQuery.firstYear % 1900; thisYearIndex <= jsonQuery.lastYear % 1900; thisYearIndex++){
-			console.log(thisYearIndex);
 			if(jsonQuery.genres == null){
 				listOfGenres = this.arrayOfGenres;
 			}else{
 				listOfGenres = jsonQuery.genres;
 			}
-			console.log("New Year");
 			jsonResult.years.push({	"year": thisYearIndex + 1900,
 									"genres":[]});
 
 			if(jsonQuery.cast == null && jsonQuery.words == null){
 				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
-					if(this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]) == undefined){
+					if(this.arrayYears[thisYearIndex].genresHash.get([thisYearIndex + 1900,listOfGenres[indexOfGenre]]) == undefined){
 						cantOfMovies = 0;
 					}else{
-						cantOfMovies = this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]).count;
+						cantOfMovies = this.arrayYears[thisYearIndex].genresHash.get([thisYearIndex + 1900,listOfGenres[indexOfGenre]]).count;
 					}
 
-					console.log("Add Genre");
 					jsonResult.years[jsonResult.years.length - 1].genres.push(
 					{"name":listOfGenres[indexOfGenre],
 					 "amount":cantOfMovies});
-					console.log(jsonResult.years[jsonResult.years.length - 1].genres);
-					console.log(jsonQuery.maxValue);
-					if(cantOfMovies > jsonQuery.maxValue){
+					if(cantOfMovies > jsonResult.maxValue){
 						jsonQuery.maxValue = cantOfMovies;
 					}
 				}
@@ -408,7 +351,7 @@ class moviesData {
 					else{
 						listOfWords = jsonQuery.words;
 					}
-					tempBinaryTree = this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]);
+					tempBinaryTree = this.arrayYears[thisYearIndex].genresHash.get([thisYearIndex + 1900,listOfGenres[indexOfGenre]]);
 
 					//Iterate Actors/ Cast
 					for(var indexOfCast = 0; indexOfCast < listOfActors.length; indexOfCast++){
@@ -454,7 +397,8 @@ class yearNode
 
     constructor()
     {
-        this.genresHash = new HashTable();
+    	this.genresHash = require("node-hashtable");
+        //this.genresHash = new HashTable();
         this.genresCount = 0;
     }
 };
@@ -488,7 +432,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 
 // constante para definir el puerto a ser usado
-var PORT_NUMBER = 3500;
+var PORT_NUMBER = 3510;
 
 // se inicia el servidor web express
 var app = express()
@@ -516,7 +460,10 @@ var movieData = JSON.parse(fs.readFileSync('data/movies.json', 'utf8'));
 var categorias = JSON.parse(fs.readFileSync('data/categories.json', 'utf8'));
 // publicar contenido estatico que esta en ese folder
 //app.use(express.static("C:\\Users\\rodri\\OneDrive\\Personales\\Itcr\\SemI2018\\Analisis de Algoritmos\\node"));
-
+//inicializa estructura de consultas
+let movieDataInstance;
+movieDataInstance = new moviesData();
+movieDataInstance.loadData(movieData);
 
 
 
@@ -596,9 +543,9 @@ app.route('/visualization').get((req, res) => {
 app.route('/visualization').post((req, res) => {
 	
 	//console.log(req.body);
-	let cast = req.body.actores;
-	let words =  req.body.titulos;
-	let genres =  req.body.generos;
+	let cast = req.body.actores.split(",");
+	let words =  req.body.titulos.split(",")
+	let genres =  req.body.generos.split(",");
 	
 	let firstYear =  parseInt(req.body.limite1);
 	let lastYear =  parseInt(req.body.limite2);
@@ -607,7 +554,15 @@ app.route('/visualization').post((req, res) => {
 		lastYear = firstYear;
 		firstYear = swaping;
 	}
-
+	if(cast[0].length < 2){
+		cast = null
+	}
+	if(words[0].length < 2){
+		words = null
+	}
+	if(genres[0].length < 2){
+		genres = null
+	}
 	let password = req.body.password;
 
 	//creandp un json como lo resive el sistema de busquedas
@@ -626,7 +581,8 @@ app.route('/visualization').post((req, res) => {
 	
 	
 
-	var data = getDummyQuery();
+	//var data = getDummyQuery();
+	var data = movieDataInstance.getData(search_request);
 	success = myCache.set( llaveConsulta, data, 10000 );
 	console.log("Stored with key: " + llaveConsulta);
 	//si existe solo cargarla
@@ -708,14 +664,13 @@ function getDummyQuery(){
 		return data;
 }	
 //#################################################################
-/*
-console.log(movieData.length);
-let movieDataInstance;
-movieDataInstance = new moviesData();
-movieDataInstance.loadData(movieData);
 
-var jsonQ = {"cast":null, "words": null, "firstYear":1995, "lastYear":2015, "genres":["accion","aventura","drama"]};
+//console.log(movieData.length);
+
+
+var jsonQ = {"cast":null, "words": null, "firstYear":1995, "lastYear":2015, "genres":["action","drama","adventure"]};
+
 
 movieDataInstance.getData(jsonQ);
-*/
+
 //#################################################################

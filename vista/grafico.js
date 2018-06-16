@@ -19,7 +19,7 @@ function setup() {
 	var url = new URL(url_string);
 	var key = url.searchParams.get("key");
 	console.log(key);
-	loadBytes("http://localhost:3500/getchart?key="+key, loadData);
+	loadBytes("http://localhost:3510/getchart?key="+key, loadData);
 	
 	
 }
@@ -110,7 +110,7 @@ Group.prototype.drawSelf = function(position, totalGroups, maxValue){
 	textAlign(RIGHT);
 	stroke(255);
 	strokeWeight(2);
-	text(this.year, initialX - gap, height - 10);
+	text(Math.floor(this.year), initialX - gap, height - 10);
 	}
 	
 function GenreData(name, amount){
@@ -175,10 +175,11 @@ function loadData(data) {
 	var groupSize = 0;
 	
 	//descripted = wToString(decripted);
-	//console.log(decripted);
+	console.log(decripted);
 	jsonData = JSON.parse(decripted);
 	var totalYears = jsonData["totalYears"];
-	maxV = jsonData["maxValue"];
+	//maxV = jsonData["maxValue"];
+	maxV = 100;
 	//console.log("Max value" + maxV)
 	
 	if(totalYears < 10){

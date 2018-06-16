@@ -1,4 +1,480 @@
-var encriptionPasword = 'Bryan-Charlie'
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#######################  Binary Tree ############################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+
+// TreeNode class
+class TreeNode
+{
+    constructor(data)
+    {
+        this.data = data;
+        this.left = null;
+        this.right = null;
+    }
+}
+
+class BinarySearchTree
+{
+    constructor()
+    {
+        // root of a binary seach tree
+        this.root = null;
+        this.count = 0;
+    }
+ 
+ 
+    insert(data)
+    {
+        // Creating a node and initailising 
+        // with data 
+        var newTreeNode = new TreeNode(data);
+                         
+        // root is null then node will
+        // be added to the tree and made root.
+        if(this.root == null)
+            this.root = newTreeNode;
+        else
+     
+            // find the correct position in the 
+            // tree and add the node
+        return this.insertTreeNode(this.root, newTreeNode);
+    }
+     
+    insertTreeNode(node, newTreeNode)
+    {
+        // if the data is less than the node
+        // data move left of the tree 
+        if(newTreeNode.data < node.data)
+        {
+            // if left is null insert node here
+            if(node.left == null){
+                node.left = newTreeNode;
+                return newTreeNode;
+            }
+            else
+     
+                // if left is not null recurr until 
+                // null is found
+                this.insertTreeNode(node.left, newTreeNode); 
+        }
+     
+        // if the data is more than the node
+        // data move right of the tree 
+        else
+        {
+            // if right is null insert node here
+            if(node.right == null){
+                node.right = newTreeNode;
+                return newTreeNode;
+            }
+                
+            else
+     
+                // if right is not null recurr until 
+                // null is found
+                this.insertTreeNode(node.right,newTreeNode);
+        }
+        return null;
+    }
+
+    remove(data)
+    {
+        // root is re-initialized with
+        // root of a modified tree.
+        this.root = this.removeTreeNode(this.root, data);
+    }
+     
+    removeTreeNode(node, key)
+    {
+             
+        // if the root is null then tree is 
+        // empty
+        if(node == null)
+            return null;
+     
+        // if data to be delete is less than 
+        // roots data then move to left subtree
+        else if(key < node.data)
+        {
+            node.left = this.removeTreeNode(node.left, key);
+            return node;
+        }
+     
+        // if data to be delete is greater than 
+        // roots data then move to right subtree
+        else if(key > node.data)
+        {
+            node.right = this.removeTreeNode(node.right, key);
+            return node;
+        }
+     
+        // if data is similar to the root's data 
+        // then delete this node
+        else
+        {
+             // deleting node with no children
+            if(node.left == null && node.right == null)
+            {
+                node = null;
+                return node;
+            }
+     
+            // deleting node with one children
+            if(node.left == null)
+            {
+                node = node.right;
+                return node;
+            }
+             
+            else if(node.right == null)
+            {
+                node = node.left;
+                return node;
+            }
+     
+             // Deleting node with two children
+            // minumum node of the rigt subtree
+            // is stored in aux
+            var aux = this.findMinTreeNode(node.right);
+            node.data = aux.data;
+     
+            node.right = this.removeTreeNode(node.right, aux.data);
+            return node;
+        }
+     
+    }
+                     
+    findMinTreeNode(node)
+    {
+        // if left of a node is null
+        // then it must be minimum node
+        if(node.left === null)
+            return node;
+        else
+            return this.findMinTreeNode(node.left);
+    }
+
+    getRootTreeNode()
+    {
+        return this.root;
+    }
+
+    search(node, data)
+    {
+       // if trees is empty return null
+        if(node === null)
+            return null;
+     
+        // if data is less than node's data
+        // move left
+        else if(data < node.data)
+            return this.search(node.left, data);
+     
+        // if data is less than node's data
+        // move left
+        else if(data > node.data)
+            return this.search(node.right, data);
+     
+        // if data is equal to the node data 
+        // return node
+        else
+            return node;
+    }
+}
+
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#######################  Hash Table  ############################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+
+/*https://gist.github.com/alexhawkins/48d7fd31af6ed00e5c60*/
+
+class HashTable {
+  
+    constructor(){
+
+        this.data = [];
+    }
+
+    createHashIndex(key) {
+        var hash = 0;
+        for (var i = 0; i < key.length; i++) {
+            hash = (hash << 5) - hash + key.charCodeAt(i);
+            hash = hash >>> 0; //convert to 32bit unsigned integer
+        }
+        return Math.abs(hash % 1000);
+    }
+
+    insert(key, value) {
+        if (key === undefined || value === undefined || key.length === 0 || value.length === 0)
+            throw ('Insertion of undefined not possible')
+        else {
+            var hashIndex = this.createHashIndex(key);
+            this.data[hashIndex] = value;
+        }
+        return this;
+    }
+
+    getValue(key) {
+        var hashIndex = this.createHashIndex(key);
+        //return key + ': ' + this.data[hashIndex];
+        return this.data[hashIndex];
+    }
+
+};
+
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#######################  Movies Data ############################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+
+
+class moviesData {
+
+	constructor(){
+
+		this.arrayYears = [];
+		this.arrayOfGenres = [];
+	}
+
+	intersection(setA, setB) {
+    var _intersection = new Set();
+    for (var elem of setB) {
+        if (setA.has(elem)) {
+            _intersection.add(elem);
+        }
+    }
+    return _intersection;
+}
+
+	loadData(jsonFile){
+		var tempYearNode;
+		var tempBinaryTree;
+		var tempListOfWords
+		var tempTreeNode = new TreeNode('a');
+		var thisMovie;
+		var listOfGenres;
+
+		// Iterate movies
+		for(var indexOfMovie = 0; indexOfMovie < jsonFile.length; indexOfMovie++){
+			thisMovie = jsonFile[indexOfMovie];
+			if(this.arrayYears[thisMovie.year % jsonFile[0].year] == null){
+				this.arrayYears.push(new yearNode());
+				indexOfMovie--;
+			}else{
+				tempYearNode = this.arrayYears[jsonFile[indexOfMovie].year % jsonFile[0].year];
+
+				// Add genres of movie to Hash
+				if(thisMovie.genre == null){
+					listOfGenres = ["SinGenero"];
+				}else{
+					listOfGenres = thisMovie.genre.split(',');
+				}
+
+				//Avoid undefined
+				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
+					try{
+						while(listOfGenres[indexOfGenre].length < 2){
+							indexOfGenre++;
+						}
+					}
+					catch(err){
+						break;
+					}
+					
+					tempBinaryTree = tempYearNode.genresHash.getValue(listOfGenres[indexOfGenre]);
+					listOfGenres[indexOfGenre] = listOfGenres[indexOfGenre].replace(" ", "");
+					listOfGenres[indexOfGenre] = listOfGenres[indexOfGenre].toLowerCase()
+					console.log("-" + listOfGenres[indexOfGenre] + "-");
+					if(tempBinaryTree == null || tempBinaryTree == undefined){
+						tempBinaryTree = new BinarySearchTree();
+						tempYearNode.genresHash.insert(listOfGenres[indexOfGenre], tempBinaryTree);
+						this.arrayOfGenres.push(listOfGenres[indexOfGenre]);
+					}else{
+						console.log("Find it!");
+						console.log(listOfGenres[indexOfGenre]);
+					}
+					tempBinaryTree.count++;
+		 
+					// Get Words
+					tempListOfWords = thisMovie.title.split(' ');
+					if(thisMovie.cast != null){
+						tempListOfWords.push(thisMovie.cast.split(','))
+					}
+
+					//Add words to the Tree
+					for(var indexOfWords = 0; indexOfWords < tempListOfWords; indexOfWords++){
+						tempTreeNode = tempBinaryTree.search(tempBinaryTree.root, tempListOfWords[indexOfWords]);
+						if(tempTreeNode == null){
+							tempBinaryTree.insert(tempListOfWords[indexOfWords]);
+							tempTreeNode = tempBinaryTree.search(tempBinaryTree.root, tempListOfWords[indexOfWords]);
+							tempTreeNode.data = [];
+						}
+
+						//Add index of Movie to TreeNode
+						tempTreeNode.data.push(indexOfMovie);
+					}
+					//console.log(tempBinaryTree.root); 
+				}
+			}
+		}
+	}
+
+	getData(jsonQuery){
+
+		var jsonResult = {	"years":[],
+							"totalYears": jsonQuery.lastYear - jsonQuery.firstYear + 1,
+							"maxValue": 0,
+							"firstYear":jsonQuery.firstYear,
+							"lastYear":jsonQuery.lastYear};
+		console.log(jsonResult);
+		var listOfGenres;
+		var listOfActors;
+		var tempListOfActors;
+		var tempListOfWords;
+		var listOfWords;
+		var cantOfMovies;
+		var setOfMoviesA = new Set();
+		var setOfMoviesB = new Set();
+		var tempBinaryTree;
+
+		// Iterate years
+		console.log( jsonQuery.firstYear);
+		console.log( jsonQuery.lastYear);
+		console.log( this.arrayYears[0]);
+		for(var thisYearIndex = jsonQuery.firstYear % 1900; thisYearIndex <= jsonQuery.lastYear % 1900; thisYearIndex++){
+			console.log(thisYearIndex);
+			if(jsonQuery.genres == null){
+				listOfGenres = this.arrayOfGenres;
+			}else{
+				listOfGenres = jsonQuery.genres;
+			}
+			console.log("New Year");
+			jsonResult.years.push({	"year": thisYearIndex + 1900,
+									"genres":[]});
+
+			if(jsonQuery.cast == null && jsonQuery.words == null){
+				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
+					if(this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]) == undefined){
+						cantOfMovies = 0;
+					}else{
+						cantOfMovies = this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]).count;
+					}
+
+					console.log("Add Genre");
+					jsonResult.years[jsonResult.years.length - 1].genres.push(
+					{"name":listOfGenres[indexOfGenre],
+					 "amount":cantOfMovies});
+					console.log(jsonResult.years[jsonResult.years.length - 1].genres);
+					console.log(jsonQuery.maxValue);
+					if(cantOfMovies > jsonQuery.maxValue){
+						jsonQuery.maxValue = cantOfMovies;
+					}
+				}
+			}
+			else{
+				// Iterate Genres
+				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
+					if(jsonQuery.cast == null){listOfActors = [];}
+					else{
+						listOfActors = jsonQuery.cast;
+					}
+					if(jsonQuery.words == null){listOfWords = [];}
+					else{
+						listOfWords = jsonQuery.words;
+					}
+					tempBinaryTree = this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]);
+
+					//Iterate Actors/ Cast
+					for(var indexOfCast = 0; indexOfCast < listOfActors.length; indexOfCast++){
+						tempListOfActors = tempBinaryTree.search(tempBinaryTree.root, listOfActors[indexOfCast]);
+						if(tempListOfActors!= null){
+							for(var indexOfMovieIndex = 0; indexOfMovieIndex < tempListOfActors.length; indexOfMovieIndex++){
+								setOfMoviesA.add(tempListOfActors[indexOfMovieIndex]);
+							}
+						}
+					}
+
+					//Iterate Words
+					for(var indexOfWords = 0; indexOfWords < listOfWords.length; indexOfWords++){
+						tempListOfWords = tempBinaryTree.search(tempBinaryTree.root, listOfWords[indexOfWords]);
+						if(tempListOfWords!= null){
+							for(var indexOfMovieIndex = 0; indexOfMovieIndex < tempListOfWords.length; indexOfMovieIndex++){
+								setOfMoviesB.add(tempListOfWords[indexOfMovieIndex]);
+							}
+						}
+					}
+					if(jsonQuery.cast == null || jsonQuery.words == null || jsonQuery.cast == [] || jsonQuery.words == []){
+						jsonResult.years[jsonResult.years.length - 1].genres.push(
+						{"name":listOfGenres[indexOfGenre],
+					 	"amount":setOfMoviesA.length + setOfMoviesB.length});
+					}
+					else{
+						jsonResult.years[jsonResult.years.length - 1].genres.push(
+						{"name":listOfGenres[indexOfGenre],
+					 	"amount":intersection(setOfMoviesA, setOfMoviesB)});	
+					}	
+				}
+
+			}
+		}
+		console.log(jsonResult);
+		return jsonResult;
+	}
+
+};
+
+class yearNode
+{
+
+    constructor()
+    {
+        this.genresHash = new HashTable();
+        this.genresCount = 0;
+    }
+};
+
+
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#######################   Code Node  ############################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+//#################################################################
+
+
+var encriptionPasword = 'Bryan-Charlie';
 
 
 
@@ -231,4 +707,15 @@ function getDummyQuery(){
 		};
 		return data;
 }	
+//#################################################################
+/*
+console.log(movieData.length);
+let movieDataInstance;
+movieDataInstance = new moviesData();
+movieDataInstance.loadData(movieData);
 
+var jsonQ = {"cast":null, "words": null, "firstYear":1995, "lastYear":2015, "genres":["accion","aventura","drama"]};
+
+movieDataInstance.getData(jsonQ);
+*/
+//#################################################################

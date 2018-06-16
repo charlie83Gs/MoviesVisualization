@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
 	<title>Creacion de visualizacion</title>
-
+	<h1>Crear consulta</h1>
 </head>
  <form action = "/visualization" method="post">
  <table>
@@ -33,13 +33,34 @@
   	</td>
   </tr>
   <tr>
+  	<td>Contraseña:<br>
+  		<input type="text" name="password">
+  	</td>
+  </tr>
+  <tr>
   	<td>
-  		 <input type="submit" value="Submit">	
+  		 <input type="submit" value="Crear">	
   	</td>
   </tr>
 </table>
 </table>
+</form>
+<h2>Recuperar consulta</h2>
 
-</form> 
+<form action = "/loadVisualization" method = "post"> 
+	<table>
+		<tr>
+		<td>Llave:<br>
+  			<input type="text" name="key"><br>
+  		</td>
+  		</tr>
+  		<tr>
+  		<td>
+  		 	<input type="submit" value="Buscar">	
+  		</td>
+ 		</tr>
+	</table>
+</form>
+
 </body>
 </html>

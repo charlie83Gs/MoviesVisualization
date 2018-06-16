@@ -7,13 +7,19 @@ var maxV;
 var tGroups;
 var encriptionPasword = 'Bryan-Charlie'
 
+
 function setup() {
 	let scwidth = window.innerWidth;
 	let scheight = window.innerHeight;
 	canvas = createCanvas(scwidth-200, scheight-100);
 	canvas.position(100,50);
 	ready = false;
-	loadBytes("http://localhost:3500/getchart", loadData);
+	var url_string = window.location.href;
+	var url = new URL(url_string);; //window.location.href
+	var url = new URL(url_string);
+	var key = url.searchParams.get("key");
+	console.log(key);
+	loadBytes("http://localhost:3500/getchart?key="+key, loadData);
 	
 	
 }

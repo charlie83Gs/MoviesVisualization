@@ -360,7 +360,7 @@ app.use(cors())
 
 //se carga el json antes de iniciar la aplicacion
 var fs = require('fs');
-var movieData = JSON.parse(fs.readFileSync('data/moviesExample.json', 'utf8'));
+var movieData = JSON.parse(fs.readFileSync('data/movies.json', 'utf8'));
 var categorias = JSON.parse(fs.readFileSync('data/categories.json', 'utf8'));
 // publicar contenido estatico que esta en ese folder
 //app.use(express.static("C:\\Users\\rodri\\OneDrive\\Personales\\Itcr\\SemI2018\\Analisis de Algoritmos\\node"));
@@ -369,19 +369,40 @@ var categorias = JSON.parse(fs.readFileSync('data/categories.json', 'utf8'));
 app.get('/getchart',function(req, res) {
 	console.log(req.query);
 	//console.log(movieData);
-	res.send(req.query.temp+' '+ req.query.title+ ' --- Hola mundo');
-	
+	//res.send(req.query.temp+' '+ req.query.title+ ' --- Hola mundo');
+	res.send({
+		years: [{ year: 1990,
+					genres : [{name:"Comedy", amount : 130}
+							,{name:"Horror", amount : 80}
+							,{name:"Sci-Fi", amount : 60}
+							,{name:"Thriller", amount : 115}]
+				},
+				{ year: 1991,
+					genres : [{name:"Comedy", amount : 50}
+							,{name:"Horror", amount : 20}
+							,{name:"Sci-Fi", amount : 80}
+							,{name:"Thriller", amount : 12}]
+				},
+				{ year: 1992,
+					genres : [{name:"Comedy", amount : 310}
+							,{name:"Horror", amount : 115}
+							,{name:"Sci-Fi", amount : 30}]
+				},
+				{ year: 1993,
+					genres : [{name:"Comedy", amount : 16}
+							,{name:"Sci-Fi", amount : 89}
+							,{name:"Thriller", amount : 64}]
+				}],
+		totalYears:4,
+		maxValue:310,
+		firstYear:1990
+		});
 });
 
-app.get('/getchart',function(req, res) {
-	console.log(req.query);
-	//console.log(movieData);
-	res.send(req.query.temp+' '+ req.query.title+ ' --- Hola mundo');
-	
-});
 
 app.get('/getcategories', function(req, res) {
-	console.log(req.body);
+	console.log(req.query);
+	//console.log(categorias);
 	res.send(categorias);
 });
 
@@ -394,6 +415,16 @@ app.route('/d3.js').get((req, res) => {
 
 app.route('/grafico.js').get((req, res) => {
 	res.sendFile(path.join(__dirname+'/vista/grafico.js'));
+});
+
+app.route('/p5.js').get((req, res) => {
+	res.sendFile(path.join(__dirname+'/vista/p5.js'));
+});
+app.route('/p5.dom.js').get((req, res) => {
+	res.sendFile(path.join(__dirname+'/vista/p5/addons/p5.dom.js'));
+});
+app.route('/processing.js').get((req, res) => {
+	res.sendFile(path.join(__dirname+'/vista/processing.js'));
 });
 
 app.route('/').get((req, res) => {
@@ -414,9 +445,11 @@ app.on('listening', function () {
     
 });
 
+
+
+
 // escuchar comunicacion sobre el puerto indicado en HTTP
 app.listen(PORT_NUMBER);
-
 //#################################################################
 
 console.log(movieData.length);

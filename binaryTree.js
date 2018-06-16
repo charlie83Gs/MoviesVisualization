@@ -41,8 +41,10 @@ class BinarySearchTree
         if(newTreeNode.data < node.data)
         {
             // if left is null insert node here
-            if(node.left === null)
+            if(node.left === null){
                 node.left = newTreeNode;
+                return node.left;
+            }
             else
      
                 // if left is not null recurr until 
@@ -55,8 +57,11 @@ class BinarySearchTree
         else
         {
             // if right is null insert node here
-            if(node.right === null)
+            if(node.right === null){
                 node.right = newTreeNode;
+                return node.right;
+            }
+                
             else
      
                 // if right is not null recurr until 

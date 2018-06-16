@@ -250,6 +250,7 @@ class moviesData {
 	constructor(){
 
 		this.arrayYears = [];
+		this.arrayOfGenres = [];
 	}
 
 	loadData(jsonFile){
@@ -267,41 +268,90 @@ class moviesData {
 				arrayYears.push(new yearNode());
 				indexOfMovie--;
 			}else{
-				tempYearNode = this.arrayYears[jsonFile[indexOfMovie].year % jsonFile[0].year];
+				tempYearNode = this.arrayYears[jsonFile[indexOfMovie].year % jsonFile[0].year].;
 
 				// Add genres of movie to Hash
 				if(thisMovie.genre == null){
-					listOfGenres = ["null"];
+					listOfGenres = ["SinGenero"];
 				}else{
 					listOfGenres = thisMovie.genre.split(',');
 				}
-					for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
-						tempBinaryTree = tempYearNode.genresHash.getValue(listOfGenres[indexOfGenre]);
-						if(tempBinaryTree == null){
-							tempBinaryTree = new BinarySearchTree();
-							tempYearNode.genresHash.insert(listOfGenres[indexOfGenre], tempBinaryTree);
-						}
-		 
-						// Get Words
-						tempListOfWords = thisMovie.title.split(' ');
-						if(thisMovie.cast != null){
-							tempListOfWords.push(thisMovie.cast.split(','))
-						}
-
-						//Add words to the Tree
-						for(var indexOfWords = 0; indexOfWords < tempListOfWords; indexOfWords++){
-							tempTreeNode = tempBinaryTree.search(tempBinaryTree.root, tempListOfWords[indexOfWords]);
-							if(tempTreeNode == null){
-								tempTreeNode = tempBinaryTree.insert(tempListOfWords[indexOfWords]);
-								tempTreeNode.data = [];
-							}
-
-							//Add index of Movie to TreeNode
-							tempTreeNode.data.push(indexOfMovie);
-						}
+				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
+					tempBinaryTree = tempYearNode.genresHash.getValue(listOfGenres[indexOfGenre]);
+					if(tempBinaryTree == null){
+						tempBinaryTree = new BinarySearchTree();
+						tempYearNode.genresHash.insert(listOfGenres[indexOfGenre], tempBinaryTree);
+						this.arrayOfGenres.push(listOfGenres[indexOfGenre]);
 					}
+					tempBinaryTree.count++;
+		 
+					// Get Words
+					tempListOfWords = thisMovie.title.split(' ');
+					if(thisMovie.cast != null){
+						tempListOfWords.push(thisMovie.cast.split(','))
+					}
+
+					//Add words to the Tree
+					for(var indexOfWords = 0; indexOfWords < tempListOfWords; indexOfWords++){
+						tempTreeNode = tempBinaryTree.search(tempBinaryTree.root, tempListOfWords[indexOfWords]);
+						if(tempTreeNode == null){
+							tempTreeNode = tempBinaryTree.insert(tempListOfWords[indexOfWords]);
+							tempTreeNode.data = [];
+						}
+
+						//Add index of Movie to TreeNode
+						tempTreeNode.data.push(indexOfMovie);
+					}
+				}
 			}
 		}
+	}
+
+	getData(jsonQuery){
+		var jsonResult = {	"years":[],
+							"totalYears": jsonQuery.lastYear - jsonQuery.firstYear + 1,
+							"maxValue": 0,
+							"firstYear":jsonQuery.firstYear,
+							"lastYear":jsonQuery.lastYear}
+		var listOfGenres;
+		var listOfActors;
+		var listOfWords;
+		var cantOfMovies;
+		var setOfMovies = new Set();
+
+		// Iterate years
+		for(var thisYearIndex = jsonQuery.firstYear; thisYearIndex <= jsonQuery.lastYear; thisYearIndex++){
+			if(jsonQuery.genres == null){
+				listOfGenres = this.arrayOfGenres;
+			}else{
+				listOfGenres = jsonQuery.genres;
+			}
+			jsonResult.years.push({	"year": arrayYears[thisYearIndex],
+									"genres":[]});
+
+			if(jsonQuery.cast == null && jsonQuery.words == null){
+				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
+					cantOfMovies = arrayYears[thisYearIndex].genresHash.getValue(arrayOfGenres[indexOfGenre]).count;
+					jsonResult.years[jsonResult.years.length - 1].genres.push(
+					{"name":arrayOfGenres[indexOfGenre],
+					 "amount":cantOfMovies});
+					if(cantOfMovies > jsonQuery.maxValue){
+						jsonQuery.maxValue = cantOfMovies;
+					}
+				}
+			}
+			else{
+				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
+					if(jsonQuery.cast == null){listOfActors = [];}
+					if(jsonQuery.words == null){listOfWords = [];}
+					
+					
+
+				}
+
+			}
+		}
+		return jsonResult;
 	}
 
 };
@@ -329,7 +379,6 @@ class yearNode
 //#################################################################
 //#################################################################
 //#################################################################
-
 
 
 
@@ -394,7 +443,7 @@ app.get('/getchart',function(req, res) {
 							,{name:"Thriller", amount : 64}]
 				}],
 		totalYears:4,
-		maxValue:310,
+		maxValue:130,
 		firstYear:1990
 		});
 });
@@ -459,5 +508,4 @@ movieDataInstance.loadData(movieData);
 //#################################################################
 
 console.log("Listening on port "+PORT_NUMBER)
-
 

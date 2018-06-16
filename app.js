@@ -28,6 +28,7 @@ class BinarySearchTree
     {
         // root of a binary seach tree
         this.root = null;
+        this.count = 0;
     }
  
  
@@ -39,7 +40,7 @@ class BinarySearchTree
                          
         // root is null then node will
         // be added to the tree and made root.
-        if(this.root === null)
+        if(this.root == null)
             this.root = newTreeNode;
         else
      
@@ -55,9 +56,9 @@ class BinarySearchTree
         if(newTreeNode.data < node.data)
         {
             // if left is null insert node here
-            if(node.left === null){
+            if(node.left == null){
                 node.left = newTreeNode;
-                return node.left;
+                return newTreeNode;
             }
             else
      
@@ -71,9 +72,9 @@ class BinarySearchTree
         else
         {
             // if right is null insert node here
-            if(node.right === null){
+            if(node.right == null){
                 node.right = newTreeNode;
-                return node.right;
+                return newTreeNode;
             }
                 
             else
@@ -97,7 +98,7 @@ class BinarySearchTree
              
         // if the root is null then tree is 
         // empty
-        if(node === null)
+        if(node == null)
             return null;
      
         // if data to be delete is less than 
@@ -121,26 +122,26 @@ class BinarySearchTree
         else
         {
              // deleting node with no children
-            if(node.left === null && node.right === null)
+            if(node.left == null && node.right == null)
             {
                 node = null;
                 return node;
             }
      
             // deleting node with one children
-            if(node.left === null)
+            if(node.left == null)
             {
                 node = node.right;
                 return node;
             }
              
-            else if(node.right === null)
+            else if(node.right == null)
             {
                 node = node.left;
                 return node;
             }
      
-            // Deleting node with two children
+             // Deleting node with two children
             // minumum node of the rigt subtree
             // is stored in aux
             var aux = this.findMinTreeNode(node.right);
@@ -275,7 +276,7 @@ class moviesData {
 		var tempYearNode;
 		var tempBinaryTree;
 		var tempListOfWords
-		var tempTreeNode;
+		var tempTreeNode = new TreeNode('a');
 		var thisMovie;
 		var listOfGenres;
 
@@ -294,12 +295,29 @@ class moviesData {
 				}else{
 					listOfGenres = thisMovie.genre.split(',');
 				}
+
+				//Avoid undefined
 				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
+					try{
+						while(listOfGenres[indexOfGenre].length < 2){
+							indexOfGenre++;
+						}
+					}
+					catch(err){
+						break;
+					}
+					
 					tempBinaryTree = tempYearNode.genresHash.getValue(listOfGenres[indexOfGenre]);
-					if(tempBinaryTree == null){
+					listOfGenres[indexOfGenre] = listOfGenres[indexOfGenre].replace(" ", "");
+					listOfGenres[indexOfGenre] = listOfGenres[indexOfGenre].toLowerCase()
+					console.log("-" + listOfGenres[indexOfGenre] + "-");
+					if(tempBinaryTree == null || tempBinaryTree == undefined){
 						tempBinaryTree = new BinarySearchTree();
 						tempYearNode.genresHash.insert(listOfGenres[indexOfGenre], tempBinaryTree);
 						this.arrayOfGenres.push(listOfGenres[indexOfGenre]);
+					}else{
+						console.log("Find it!");
+						console.log(listOfGenres[indexOfGenre]);
 					}
 					tempBinaryTree.count++;
 		 
@@ -313,24 +331,28 @@ class moviesData {
 					for(var indexOfWords = 0; indexOfWords < tempListOfWords; indexOfWords++){
 						tempTreeNode = tempBinaryTree.search(tempBinaryTree.root, tempListOfWords[indexOfWords]);
 						if(tempTreeNode == null){
-							tempTreeNode = tempBinaryTree.insert(tempListOfWords[indexOfWords]);
+							tempBinaryTree.insert(tempListOfWords[indexOfWords]);
+							tempTreeNode = tempBinaryTree.search(tempBinaryTree.root, tempListOfWords[indexOfWords]);
 							tempTreeNode.data = [];
 						}
 
 						//Add index of Movie to TreeNode
 						tempTreeNode.data.push(indexOfMovie);
 					}
+					//console.log(tempBinaryTree.root); 
 				}
 			}
 		}
 	}
 
 	getData(jsonQuery){
+
 		var jsonResult = {	"years":[],
 							"totalYears": jsonQuery.lastYear - jsonQuery.firstYear + 1,
 							"maxValue": 0,
 							"firstYear":jsonQuery.firstYear,
-							"lastYear":jsonQuery.lastYear}
+							"lastYear":jsonQuery.lastYear};
+		console.log(jsonResult);
 		var listOfGenres;
 		var listOfActors;
 		var tempListOfActors;
@@ -342,21 +364,34 @@ class moviesData {
 		var tempBinaryTree;
 
 		// Iterate years
-		for(var thisYearIndex = jsonQuery.firstYear % arrayYears[0]; thisYearIndex <= jsonQuery.lastYear % arrayYears[0]; thisYearIndex++){
+		console.log( jsonQuery.firstYear);
+		console.log( jsonQuery.lastYear);
+		console.log( this.arrayYears[0]);
+		for(var thisYearIndex = jsonQuery.firstYear % 1900; thisYearIndex <= jsonQuery.lastYear % 1900; thisYearIndex++){
+			console.log(thisYearIndex);
 			if(jsonQuery.genres == null){
 				listOfGenres = this.arrayOfGenres;
 			}else{
 				listOfGenres = jsonQuery.genres;
 			}
-			jsonResult.years.push({	"year": arrayYears[thisYearIndex],
+			console.log("New Year");
+			jsonResult.years.push({	"year": thisYearIndex + 1900,
 									"genres":[]});
 
 			if(jsonQuery.cast == null && jsonQuery.words == null){
 				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
-					cantOfMovies = arrayYears[thisYearIndex].genresHash.getValue(arrayOfGenres[indexOfGenre]).count;
+					if(this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]) == undefined){
+						cantOfMovies = 0;
+					}else{
+						cantOfMovies = this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]).count;
+					}
+
+					console.log("Add Genre");
 					jsonResult.years[jsonResult.years.length - 1].genres.push(
 					{"name":listOfGenres[indexOfGenre],
 					 "amount":cantOfMovies});
+					console.log(jsonResult.years[jsonResult.years.length - 1].genres);
+					console.log(jsonQuery.maxValue);
 					if(cantOfMovies > jsonQuery.maxValue){
 						jsonQuery.maxValue = cantOfMovies;
 					}
@@ -408,6 +443,7 @@ class moviesData {
 
 			}
 		}
+		console.log(jsonResult);
 		return jsonResult;
 	}
 
@@ -562,6 +598,10 @@ console.log(movieData.length);
 let movieDataInstance;
 movieDataInstance = new moviesData();
 movieDataInstance.loadData(movieData);
+
+var jsonQ = {"cast":null, "words": null, "firstYear":1995, "lastYear":2015, "genres":["accion","aventura","drama"]};
+
+movieDataInstance.getData(jsonQ);
 //#################################################################
 
 console.log("Listening on port "+PORT_NUMBER)

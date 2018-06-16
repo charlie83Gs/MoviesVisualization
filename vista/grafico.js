@@ -5,6 +5,7 @@ var visualization;
 var ready;
 var maxV;
 var tGroups;
+var encriptionPasword = 'Bryan-Charlie'
 
 function setup() {
 	let scwidth = window.innerWidth;
@@ -12,7 +13,7 @@ function setup() {
 	canvas = createCanvas(scwidth-200, scheight-100);
 	canvas.position(100,50);
 	ready = false;
-	loadJSON("http://localhost:3500/getchart", loadData);
+	loadBytes("http://localhost:3500/getchart", loadData);
 	
 }
 
@@ -93,7 +94,7 @@ Group.prototype.drawSelf = function(position, totalGroups, maxValue){
 		acumulado += amount;
 	}
 	fill(0);
-	console.log(height)
+	//console.log(height)
 	stroke(0,0,0,60)
 	line(initialX - gap,0, initialX - gap,height);
 	textAlign(RIGHT);
@@ -147,13 +148,24 @@ window.onresize = function() {
 
 
 function loadData(data) {
-	//console.log(data);
-	jsonData = data;
-	visualization = [];
-	var totalYears = data["totalYears"];
-	maxV = data["maxValue"];
 	
+	jsonData = bin2String(data["bytes"]);
+	console.log(jsonData);
+	visualization = [];
+
+	
+	
+	var decripted = CryptoJS.AES.decrypt(jsonData, encriptionPasword);
+	decripted = decripted.toString(CryptoJS.enc.Utf8);
 	var groupSize = 0;
+	
+	//descripted = wToString(decripted);
+	console.log(decripted);
+	jsonData = JSON.parse(decripted);
+	var totalYears = jsonData["totalYears"];
+	maxV = jsonData["maxValue"];
+	
+	
 	if(totalYears < 10){
 		groupSize = 1;
 	}else{
@@ -177,4 +189,13 @@ function loadData(data) {
 	}
 	ready = true;
 	
+}
+
+//convierte a un byte array en string
+function bin2String(array) {
+  return String.fromCharCode.apply(String, array);
+}
+
+function wToString(words){
+      return CryptoJS.enc.Utf8.stringify(words);
 }

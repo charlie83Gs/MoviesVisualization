@@ -253,6 +253,16 @@ class moviesData {
 		this.arrayOfGenres = [];
 	}
 
+	intersection(setA, setB) {
+    var _intersection = new Set();
+    for (var elem of setB) {
+        if (setA.has(elem)) {
+            _intersection.add(elem);
+        }
+    }
+    return _intersection;
+}
+
 	loadData(jsonFile){
 		var tempYearNode;
 		var tempBinaryTree;
@@ -315,12 +325,16 @@ class moviesData {
 							"lastYear":jsonQuery.lastYear}
 		var listOfGenres;
 		var listOfActors;
+		var tempListOfActors;
+		var tempListOfWords;
 		var listOfWords;
 		var cantOfMovies;
-		var setOfMovies = new Set();
+		var setOfMoviesA = new Set();
+		var setOfMoviesB = new Set();
+		var tempBinaryTree;
 
 		// Iterate years
-		for(var thisYearIndex = jsonQuery.firstYear; thisYearIndex <= jsonQuery.lastYear; thisYearIndex++){
+		for(var thisYearIndex = jsonQuery.firstYear % arrayYears[0]; thisYearIndex <= jsonQuery.lastYear % arrayYears[0]; thisYearIndex++){
 			if(jsonQuery.genres == null){
 				listOfGenres = this.arrayOfGenres;
 			}else{
@@ -333,7 +347,7 @@ class moviesData {
 				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
 					cantOfMovies = arrayYears[thisYearIndex].genresHash.getValue(arrayOfGenres[indexOfGenre]).count;
 					jsonResult.years[jsonResult.years.length - 1].genres.push(
-					{"name":arrayOfGenres[indexOfGenre],
+					{"name":listOfGenres[indexOfGenre],
 					 "amount":cantOfMovies});
 					if(cantOfMovies > jsonQuery.maxValue){
 						jsonQuery.maxValue = cantOfMovies;
@@ -341,12 +355,47 @@ class moviesData {
 				}
 			}
 			else{
+				// Iterate Genres
 				for(var indexOfGenre = 0; indexOfGenre < listOfGenres.length; indexOfGenre++){
 					if(jsonQuery.cast == null){listOfActors = [];}
+					else{
+						listOfActors = jsonQuery.cast;
+					}
 					if(jsonQuery.words == null){listOfWords = [];}
-					
-					
+					else{
+						listOfWords = jsonQuery.words;
+					}
+					tempBinaryTree = this.arrayYears[thisYearIndex].genresHash.getValue(listOfGenres[indexOfGenre]);
 
+					//Iterate Actors/ Cast
+					for(var indexOfCast = 0; indexOfCast < listOfActors.length; indexOfCast++){
+						tempListOfActors = tempBinaryTree.search(tempBinaryTree.root, listOfActors[indexOfCast]);
+						if(tempListOfActors!= null){
+							for(var indexOfMovieIndex = 0; indexOfMovieIndex < tempListOfActors.length; indexOfMovieIndex++){
+								setOfMoviesA.add(tempListOfActors[indexOfMovieIndex]);
+							}
+						}
+					}
+
+					//Iterate Words
+					for(var indexOfWords = 0; indexOfWords < listOfWords.length; indexOfWords++){
+						tempListOfWords = tempBinaryTree.search(tempBinaryTree.root, listOfWords[indexOfWords]);
+						if(tempListOfWords!= null){
+							for(var indexOfMovieIndex = 0; indexOfMovieIndex < tempListOfWords.length; indexOfMovieIndex++){
+								setOfMoviesB.add(tempListOfWords[indexOfMovieIndex]);
+							}
+						}
+					}
+					if(jsonQuery.cast == null || jsonQuery.words == null || jsonQuery.cast == [] || jsonQuery.words == []){
+						jsonResult.years[jsonResult.years.length - 1].genres.push(
+						{"name":listOfGenres[indexOfGenre],
+					 	"amount":setOfMoviesA.length + setOfMoviesB.length});
+					}
+					else{
+						jsonResult.years[jsonResult.years.length - 1].genres.push(
+						{"name":listOfGenres[indexOfGenre],
+					 	"amount":intersection(setOfMoviesA, setOfMoviesB)});	
+					}	
 				}
 
 			}
@@ -508,4 +557,3 @@ movieDataInstance.loadData(movieData);
 //#################################################################
 
 console.log("Listening on port "+PORT_NUMBER)
-

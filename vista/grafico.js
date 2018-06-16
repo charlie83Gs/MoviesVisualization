@@ -7,13 +7,20 @@ var maxV;
 var tGroups;
 var encriptionPasword = 'Bryan-Charlie'
 
+
 function setup() {
 	let scwidth = window.innerWidth;
 	let scheight = window.innerHeight;
 	canvas = createCanvas(scwidth-200, scheight-100);
 	canvas.position(100,50);
 	ready = false;
-	loadBytes("http://localhost:3500/getchart", loadData);
+	var url_string = window.location.href;
+	var url = new URL(url_string);; //window.location.href
+	var url = new URL(url_string);
+	var key = url.searchParams.get("key");
+	console.log(key);
+	loadBytes("http://localhost:3500/getchart?key="+key, loadData);
+	
 	
 }
 
@@ -70,21 +77,24 @@ Group.prototype.drawSelf = function(position, totalGroups, maxValue){
 	//console.log(this.groups.length);
 	var acumulado = 0;
 	let initialX = position*horizontalSize + sideGap/2 + gap*(position+1);
-	maxValue += 50;
+	//maxValue += 50;
 	let maxCircleSize = horizontalSize / 3.0;
 	strokeWeight(2);
 	textAlign(CENTER);
+	//draw circles in visualization
+	//ellipseMode(CENTER);
 	for(group = 0; group < this.groups.length; group++){
 		fill(this.groups[group].drawcolor);
 		stroke(0);
 		let amount = this.groups[group].amount
 		let radius = map(amount, 0, maxValue, 1 , maxCircleSize);
 		let yPos = map(amount,0, maxValue,height,0);
+		//console.log(maxValue);
 		let xPos = map(acumulado,0, this.totalMovies,0,horizontalSize) + initialX;
 		ellipse( xPos, yPos,radius,radius);
 		let d = dist(xPos, yPos, mouseX,mouseY);
 		if(d < radius){
-			ellipse( xPos, yPos,radius*1.1,radius*1.1);
+			ellipse( xPos, yPos,radius*1.2,radius*1.2);
 			fill(180);
 			noStroke;
 			text(this.groups[group].name, xPos, yPos);
@@ -112,13 +122,18 @@ function GenreData(name, amount){
 	this.drawcolor = color(r,g,b);
 	}
 
-function drawHvalues(maxV, segments){
-	textAlign(LEFT);
+function drawHvalues(maxValue, segments){
+	textAlign(LEFT,BOTTOM);
 	segmentSize = height/(segments);
 	fill(0);
+	var yPos = 0;
 	for(let segment = 0; segment < segments; segment++){
-		text(Math.floor(segment*segmentSize), 0 ,  height - segmentSize * segment);
+		//yPos =height - segmentSize * segment;
+		yPos = map(maxValue/segments*segment,0, maxValue,height,0);
+		text(Math.floor(maxValue/segments*segment), 0 , yPos);
 	}
+		//console.log(maxValue)
+		//console.log(height)
 	}
 
 
@@ -150,7 +165,7 @@ window.onresize = function() {
 function loadData(data) {
 	
 	jsonData = bin2String(data["bytes"]);
-	console.log(jsonData);
+	//console.log(jsonData);
 	visualization = [];
 
 	
@@ -160,11 +175,11 @@ function loadData(data) {
 	var groupSize = 0;
 	
 	//descripted = wToString(decripted);
-	console.log(decripted);
+	//console.log(decripted);
 	jsonData = JSON.parse(decripted);
 	var totalYears = jsonData["totalYears"];
 	maxV = jsonData["maxValue"];
-	
+	//console.log("Max value" + maxV)
 	
 	if(totalYears < 10){
 		groupSize = 1;
@@ -189,6 +204,9 @@ function loadData(data) {
 	}
 	ready = true;
 	
+	//little displacement
+	maxV += 50;
+	
 }
 
 //convierte a un byte array en string
@@ -199,3 +217,4 @@ function bin2String(array) {
 function wToString(words){
       return CryptoJS.enc.Utf8.stringify(words);
 }
+

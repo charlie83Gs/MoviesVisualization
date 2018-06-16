@@ -21,6 +21,11 @@ var app = express()
 var path = require('path');
 
 
+//cache relate libraries
+const NodeCache = require( "node-cache" );
+const myCache = new NodeCache();
+
+const url = require('url'); 
 
 // iniciar el parsing de json
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -52,12 +57,12 @@ app.get('/getchart',function(req, res) {
 				},
 				{ year: 1991,
 					genres : [{name:"Comedy", amount : 50}
-							,{name:"Horror", amount : 20}
+							,{name:"Horror", amount : 315}
 							,{name:"Sci-Fi", amount : 80}
 							,{name:"Thriller", amount : 12}]
 				},
 				{ year: 1992,
-					genres : [{name:"Comedy", amount : 310}
+					genres : [{name:"Comedy", amount : 420}
 							,{name:"Horror", amount : 115}
 							,{name:"Sci-Fi", amount : 30}]
 				},
@@ -67,19 +72,19 @@ app.get('/getchart',function(req, res) {
 							,{name:"Thriller", amount : 64}]
 				}],
 		totalYears:4,
-		maxValue:310,
+		maxValue:420,
 		firstYear:1990
 		};
 	let stringData = JSON.stringify(data);
 
 	let ciphertext = CryptoJS.AES.encrypt(stringData, encriptionPasword);
 	stringData = ciphertext.toString();
-	console.log(stringData);
-	let decripted = CryptoJS.AES.decrypt(stringData, encriptionPasword);
-	decripted = decripted.toString(CryptoJS.enc.Utf8);
-	console.log(decripted);
-	JSON.parse(decripted);
-
+	//console.log(stringData);
+	//let decripted = CryptoJS.AES.decrypt(stringData, encriptionPasword);
+	//decripted = decripted.toString(CryptoJS.enc.Utf8);
+	//console.log(decripted);
+	//JSON.parse(decripted);
+	console.log("Visualization requet received")
 	
 	res.send(stringData);
 		
@@ -117,7 +122,25 @@ app.route('/').get((req, res) => {
 	
 	
 	
+	res.sendFile(path.join(__dirname+'/vista/query.html'));
+});
+
+app.route('/visualization').get((req, res) => {
+	
+	
+	
 	res.sendFile(path.join(__dirname+'/vista/index.html'));
+});
+
+app.route('/visualization').post((req, res) => {
+	
+	
+	console.log(req.body);
+	//res.body = req.body;
+	res.redirect(url.format({
+       pathname:"/visualization",
+       query: req.body
+     }));
 });
 
 
@@ -130,7 +153,6 @@ app.route('/home').get((req,res) =>{
 app.on('listening', function () {
     
 });
-
 
 
 

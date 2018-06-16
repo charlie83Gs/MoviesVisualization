@@ -30,6 +30,7 @@ class BinarySearchTree
         this.root = null;
     }
  
+ 
     insert(data)
     {
         // Creating a node and initailising 
@@ -44,7 +45,7 @@ class BinarySearchTree
      
             // find the correct position in the 
             // tree and add the node
-            this.insertTreeNode(this.root, newTreeNode);
+        return this.insertTreeNode(this.root, newTreeNode);
     }
      
     insertTreeNode(node, newTreeNode)
@@ -54,8 +55,10 @@ class BinarySearchTree
         if(newTreeNode.data < node.data)
         {
             // if left is null insert node here
-            if(node.left === null)
+            if(node.left === null){
                 node.left = newTreeNode;
+                return node.left;
+            }
             else
      
                 // if left is not null recurr until 
@@ -68,14 +71,18 @@ class BinarySearchTree
         else
         {
             // if right is null insert node here
-            if(node.right === null)
+            if(node.right === null){
                 node.right = newTreeNode;
+                return node.right;
+            }
+                
             else
      
                 // if right is not null recurr until 
                 // null is found
                 this.insertTreeNode(node.right,newTreeNode);
         }
+        return null;
     }
 
     remove(data)
@@ -211,7 +218,7 @@ class HashTable {
             hash = (hash << 5) - hash + key.charCodeAt(i);
             hash = hash >>> 0; //convert to 32bit unsigned integer
         }
-        return Math.abs(hash % max);
+        return Math.abs(hash % 1000);
     }
 
     insert(key, value) {
@@ -219,14 +226,15 @@ class HashTable {
             throw ('Insertion of undefined not possible')
         else {
             var hashIndex = this.createHashIndex(key);
-            data[hashIndex] = value;
+            this.data[hashIndex] = value;
         }
         return this;
     }
 
     getValue(key) {
         var hashIndex = this.createHashIndex(key);
-        return key + ': ' + data[hashIndex];
+        //return key + ': ' + this.data[hashIndex];
+        return this.data[hashIndex];
     }
 
 };
@@ -274,11 +282,11 @@ class moviesData {
 		// Iterate movies
 		for(var indexOfMovie = 0; indexOfMovie < jsonFile.length; indexOfMovie++){
 			thisMovie = jsonFile[indexOfMovie];
-			if(arrayYears[thisMovie.year % jsonFile[0].year] == null){
-				arrayYears.push(new yearNode());
+			if(this.arrayYears[thisMovie.year % jsonFile[0].year] == null){
+				this.arrayYears.push(new yearNode());
 				indexOfMovie--;
 			}else{
-				tempYearNode = this.arrayYears[jsonFile[indexOfMovie].year % jsonFile[0].year].;
+				tempYearNode = this.arrayYears[jsonFile[indexOfMovie].year % jsonFile[0].year];
 
 				// Add genres of movie to Hash
 				if(thisMovie.genre == null){
